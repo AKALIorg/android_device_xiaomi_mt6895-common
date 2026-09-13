@@ -96,6 +96,12 @@ blob_fixups: blob_fixups_user_type = {
         .add_needed('liblog.so'),
     'system_ext/lib64/libsink-mtk.so': blob_fixup()
         .add_needed('libaudioclient_shim.so'),
+    'system_ext/lib64/libapuwareapusys_v2.mtk.so': blob_fixup()
+        .replace_needed('vendor.mediatek.hardware.apuware.apusys-V3-ndk.so', 'vendor.mediatek.hardware.apuware.apusys-V5-ndk.so'),
+    ('system_ext/lib64/libaudiotoolkit.so', 'system_ext/lib64/libem_audio_jni.so'): blob_fixup()
+        .add_needed('libaudiobase.so'),
+    'system_ext/lib64/libarmnn_ndk.mtk.so': blob_fixup()
+        .add_needed('liblog.so'),
 }  # fmt: skip
 
 module = ExtractUtilsModule(
