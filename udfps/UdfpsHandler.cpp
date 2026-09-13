@@ -1,8 +1,5 @@
-/*
- * Copyright (C) 2022 The LineageOS Project
- *
- * SPDX-License-Identifier: Apache-2.0
- */
+// SPDX-FileCopyrightText: The LineageOS Project
+// SPDX-License-Identifier: Apache-2.0
 
 #define LOG_TAG "UdfpsHandler.xiaomi_mt6895"
 
@@ -73,7 +70,7 @@ static bool readBool(int fd) {
 
 }  // anonymous namespace
 
-class XiaomiMt6895UdfpsHander : public UdfpsHandler {
+class XiaomiMt6895UdfpsHandler : public UdfpsHandler {
   public:
     void init(fingerprint_device_t* device) {
         mDevice = device;
@@ -106,6 +103,7 @@ class XiaomiMt6895UdfpsHander : public UdfpsHandler {
     }
 
     void onFingerDown(uint32_t /*x*/, uint32_t /*y*/, float /*minor*/, float /*major*/) {
+        if (mAuthSuccess) return;
         LOG(INFO) << __func__;
         setFingerDown(true);
     }
@@ -135,9 +133,19 @@ class XiaomiMt6895UdfpsHander : public UdfpsHandler {
         setFodStatus(FOD_STATUS_OFF);
     }
 
+    void onAuthenticationSucceeded() {
+        mAuthSuccess = true;
+        onFingerUp();
+        std::thread([this]() {
+            std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            mAuthSuccess = false;
+        }).detach();
+    }
+
   private:
     fingerprint_device_t* mDevice;
     android::base::unique_fd touch_fd_;
+    bool mAuthSuccess = false;
 
     void setFodStatus(int value) {
         int buf[MAX_BUF_SIZE] = {TOUCH_ID, Touch_Fod_Enable, value};
@@ -157,7 +165,7 @@ class XiaomiMt6895UdfpsHander : public UdfpsHandler {
 };
 
 static UdfpsHandler* create() {
-    return new XiaomiMt6895UdfpsHander();
+    return new XiaomiMt6895UdfpsHandler();
 }
 
 static void destroy(UdfpsHandler* handler) {
