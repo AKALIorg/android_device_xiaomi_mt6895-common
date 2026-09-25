@@ -6,13 +6,13 @@
 
 package org.lineageos.settings.thermal
 
+import android.app.role.RoleManager
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.os.UserHandle
 import android.provider.MediaStore
-import android.telecom.DefaultDialerManager.getDefaultDialerApplication
 import androidx.annotation.StringRes
 import androidx.preference.PreferenceManager
 import org.lineageos.settings.R
@@ -118,12 +118,19 @@ private constructor(
             NAVIGATION_PACKAGES.contains(packageName) -> ThermalState.NAVIGATION
             VIDEO_CALL_PACKAGES.contains(packageName) -> ThermalState.VIDEOCALL
             BENCHMARKING_APPS.contains(packageName) -> ThermalState.BENCHMARK
-            getDefaultDialerApplication(context) == packageName -> ThermalState.DIALER
+            getDefaultDialerPackage(context) == packageName -> ThermalState.DIALER
             isBrowserApp(context, packageName, UserHandle.myUserId()) -> ThermalState.BROWSER
             isCameraApp(packageName) -> ThermalState.CAMERA
             else -> ThermalState.DEFAULT
         }
     }
+
+    private fun getDefaultDialerPackage(context: Context): String? =
+        runCatching {
+            context.getSystemService(RoleManager::class.java)
+                ?.getRoleHolders(RoleManager.ROLE_DIALER)
+                ?.firstOrNull()
+        }.getOrNull()
 
     private fun isCameraApp(packageName: String): Boolean {
         val cameraIntent =

@@ -169,6 +169,11 @@ PRODUCT_PACKAGES += \
 PRODUCT_PACKAGES += \
     android.hardware.light-service.lineage
 
+# Displayservice HAL shim (A17 removed android.frameworks.displayservice@1.0,
+# still DT_NEEDED by libmtkcam_hal_android_app_cbadaptor - no camera without it)
+PRODUCT_PACKAGES += \
+    libshim_displayservice
+
 # Lineage Health
 PRODUCT_PACKAGES += \
     vendor.lineage.health-service.default
@@ -225,9 +230,9 @@ PRODUCT_PACKAGES += \
 PRODUCT_COPY_FILES += \
     $(LOCAL_PATH)/init/init.recovery.mt6895.rc:$(TARGET_COPY_OUT_RECOVERY)/root/init.recovery.mt6895.rc
 
-# Parts
-PRODUCT_PACKAGES += \
-    XiaomiParts
+# Parts (XiaomiParts thermal app disabled - not needed)
+#PRODUCT_PACKAGES += \
+#    XiaomiParts
 
 # Permissions
 PRODUCT_COPY_FILES += \

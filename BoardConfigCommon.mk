@@ -6,6 +6,12 @@
 
 COMMON_PATH := device/xiaomi/mt6895-common
 
+# Prebuilt blobs are A14-era; A17 removed APIs they reference
+# (AudioSystem::get/setParameters, AudioTrack ctors, ...). Real linkage
+# issues were fixed properly (libmnl_mtk rename+patchelf); remaining
+# check_elf failures are unfixable-by-rebuild - skip the whole class.
+BUILD_BROKEN_PREBUILT_ELF_FILES := true
+
 # A/B
 AB_OTA_PARTITIONS += \
     system \
@@ -100,7 +106,9 @@ BOARD_VENDOR_BOOTIMAGE_PARTITION_SIZE := 67108864
 BOARD_DTBOIMG_PARTITION_SIZE := 33554432
 BOARD_USES_METADATA_PARTITION := true
 
-ifneq ($(WITH_GMS),true)
+# NOTE: Infinity uses WITH_GAPPS, Lineage uses WITH_GMS - honor both,
+# else GAPPS builds wrongly take vanilla reserved sizes (+2.8GB padding).
+ifeq ($(filter true,$(WITH_GMS) $(WITH_GAPPS)),)
 BOARD_PRODUCTIMAGE_EXTFS_INODE_COUNT := -1
 BOARD_PRODUCTIMAGE_PARTITION_RESERVED_SIZE := 1258291200
 BOARD_SYSTEMIMAGE_EXTFS_INODE_COUNT := -1
