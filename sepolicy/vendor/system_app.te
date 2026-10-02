@@ -5,3 +5,9 @@ get_prop(system_app, vendor_mtk_default_prop)
 # Thermal Access for XiaomiParts
 allow system_app sysfs_therm:dir search;
 allow system_app sysfs_therm:file rw_file_perms;
+
+# Bypass charging node for Extra Battery Options (LineageParts, system uid).
+# Parent power_supply dir is labeled sysfs_batteryinfo on A17.
+allow system_app sysfs_batteryinfo:dir search;
+allow system_app sysfs_power_supply:dir search;
+allow system_app sysfs_power_supply:file rw_file_perms;
